@@ -1,27 +1,48 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <!-- 스마트폰 홈 화면 앱 아이콘 설정 -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>카카오톡</title>
+
+  <!-- iOS / Safari 진짜 앱 풀스크린(주소창/상하단바 제거) 필수 설정 -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="카카오톡">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#f0f3f6">
+
+  <!-- 카카오톡 앱 아이콘 지정 -->
   <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/e/e3/KakaoTalk_logo.svg">
   <link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/e/e3/KakaoTalk_logo.svg">
-  
-  <!-- 웹 브라우저 상단바 없이 진짜 앱처럼 전체화면으로 실행되게 하는 설정 -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="카카오톡">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>카카오 지갑</title>
-  <!-- Tailwind CSS CDN -->
+
+  <!-- PWA 매니페스트 (브라우저 주소창 강제 숨김) -->
+  <link rel="manifest" href="data:application/manifest+json;utf8,%7B%22name%22%3A%22%EC%B9%B4%EC%B9%B4%EC%98%A4%ED%86%A1%22%2C%22short_name%22%3A%22%EC%B9%B4%EC%B9%B4%EC%98%A4%ED%86%A1%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f0f3f6%22%2C%22theme_color%22%3A%22%23f0f3f6%22%7D">
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Phosphor Icons for interface glyphs -->
+  <!-- Phosphor Icons -->
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
     * {
       font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
+    }
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background-color: #121212;
+    }
+    /* iOS 상단 노치 / 하단 홈 바 안전 여백 처리 */
+    .safe-top {
+      padding-top: env(safe-area-inset-top, 44px);
+    }
+    .safe-bottom {
+      padding-bottom: env(safe-area-inset-bottom, 20px);
     }
     .no-scrollbar::-webkit-scrollbar {
       display: none;
@@ -30,35 +51,31 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-    /* Subtle dot grid pattern on Screen 1 & 2 */
     .bg-dots {
       background-color: #f0f3f6;
       background-image: radial-gradient(#dbe0e6 1.3px, transparent 1.3px);
       background-size: 13px 13px;
     }
-    /* Overlapping card stack animation & style */
     .stacked-card {
       box-shadow: 0 -4px 14px -3px rgba(0, 0, 0, 0.08), 0 6px 16px -2px rgba(0, 0, 0, 0.06);
-      transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+      transition: transform 0.15s ease-out;
     }
     .stacked-card:active {
       transform: scale(0.985);
     }
   </style>
 </head>
-<body class="bg-neutral-900 min-h-screen flex items-center justify-center p-0 sm:p-4">
+<body class="flex items-center justify-center min-h-screen sm:bg-neutral-900 bg-white">
 
-  <!-- Main Mobile Frame Container -->
-  <div class="w-full max-w-[400px] h-[100dvh] sm:h-[840px] bg-white sm:rounded-[44px] shadow-2xl relative overflow-hidden flex flex-col sm:border-[8px] sm:border-neutral-800">
-    
-    <!-- iPhone Top Status Bar -->
-    <header class="w-full pt-3 px-6 flex justify-between items-center text-xs font-semibold text-slate-800 z-50 shrink-0 bg-transparent">
+  <!-- 전체 화면 컨테이너 (모바일 화면 전체 100% 매핑) -->
+  <div class="w-full sm:max-w-[410px] h-[100dvh] bg-white sm:rounded-[44px] shadow-2xl relative overflow-hidden flex flex-col sm:border-[8px] sm:border-neutral-800">
+
+    <!-- 아이폰 스타일 상태바 -->
+    <header class="w-full safe-top pt-2 px-6 flex justify-between items-center text-xs font-semibold text-slate-800 z-50 shrink-0 bg-transparent">
       <div class="flex items-center space-x-1 font-bold text-sm tracking-tight text-neutral-900">
         <span id="statusBarTime">22:58</span>
         <svg class="w-3.5 h-3.5 fill-current ml-0.5" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14.5l-4-4 1.41-1.41L13 13.67l5.59-5.59L20 9.5l-7 7z"/></svg>
       </div>
-      <!-- Dynamic Island for desktop mockup preview -->
-      <div class="w-24 h-4 bg-black rounded-full hidden sm:block"></div>
       <div class="flex items-center space-x-1.5 text-neutral-800">
         <i class="ph-bold ph-cell-signal-full text-xs"></i>
         <i class="ph-bold ph-wifi-high text-xs"></i>
@@ -68,12 +85,11 @@
       </div>
     </header>
 
-    <!-- App Screen Viewport -->
+    <!-- 뷰포트 영역 -->
     <main class="flex-1 relative overflow-hidden flex flex-col">
 
-      <!-- ================= SCREEN 1: 더보기 홈 ================= -->
-      <section id="screen-home" class="absolute inset-0 flex flex-col bg-dots transition-opacity duration-200 z-20 overflow-y-auto no-scrollbar pb-24">
-        <!-- Top App Bar -->
+      <!-- ================= 화면 1: 더보기 홈 ================= -->
+      <section id="screen-home" class="absolute inset-0 flex flex-col bg-dots transition-opacity duration-200 z-20 overflow-y-auto no-scrollbar pb-32">
         <div class="px-5 pt-2 pb-2 flex items-center justify-between">
           <h1 class="text-[22px] font-extrabold text-neutral-800 tracking-tight">더보기</h1>
           <div class="flex items-center space-x-3.5 text-neutral-700 text-xl">
@@ -86,7 +102,6 @@
           </div>
         </div>
 
-        <!-- Category Nav Pills -->
         <nav class="px-5 py-1.5 flex items-center space-x-2">
           <button class="px-3.5 py-1 rounded-full text-xs font-bold bg-neutral-900 text-white shadow-sm">홈</button>
           <button onclick="goToScreen('wallet')" class="px-3.5 py-1 rounded-full text-xs font-semibold bg-white text-neutral-700 shadow-sm flex items-center space-x-1 hover:bg-neutral-50 active:scale-95 transition">
@@ -96,7 +111,7 @@
           <button class="px-3.5 py-1 rounded-full text-xs font-semibold bg-white text-neutral-700 shadow-sm hover:bg-neutral-50">게임</button>
         </nav>
 
-        <!-- Kakao Pay Banner -->
+        <!-- 카카오 페이 바 -->
         <div class="px-4 mt-2">
           <div class="bg-[#FEE500] rounded-2xl px-4 py-3.5 flex items-center justify-between shadow-sm">
             <div class="flex items-center space-x-2">
@@ -118,63 +133,54 @@
           </div>
         </div>
 
-        <!-- 12 Vector Icons Grid matching Kakao UI exactly -->
+        <!-- 12개 서비스 그리드 아이콘 -->
         <div class="px-4 mt-2.5">
           <div class="bg-white/90 backdrop-blur-md rounded-2xl px-3 py-4 shadow-sm border border-white/60">
             <div class="grid grid-cols-4 gap-y-3.5 gap-x-1 text-center text-[11px] text-neutral-700 font-medium">
-              
-              <!-- 1. 선물하기 -->
+              <!-- 선물하기 -->
               <div class="flex flex-col items-center cursor-pointer group active:scale-95 transition">
                 <div class="w-10 h-10 flex items-center justify-center mb-1 text-neutral-600">
                   <svg class="w-6 h-6 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="20 12 20 22 4 22 4 12" />
-                    <rect x="2" y="7" width="20" height="5" rx="1" />
-                    <line x1="12" y1="22" x2="12" y2="7" />
-                    <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
-                    <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+                    <polyline points="20 12 20 22 4 22 4 12" /><rect x="2" y="7" width="20" height="5" rx="1" /><line x1="12" y1="22" x2="12" y2="7" />
+                    <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" /><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
                   </svg>
                 </div>
                 <span>선물하기</span>
               </div>
 
-              <!-- 2. 받은선물 -->
+              <!-- 받은선물 -->
               <div class="flex flex-col items-center cursor-pointer group active:scale-95 transition">
                 <div class="w-10 h-10 flex items-center justify-center mb-1 text-neutral-600">
                   <svg class="w-6 h-6 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                    <path d="M12 5.67V21.23" stroke-dasharray="2 2"/>
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /><path d="M12 5.67V21.23" stroke-dasharray="2 2"/>
                   </svg>
                 </div>
                 <span>받은선물</span>
               </div>
 
-              <!-- 3. 톡딜 (with red dot) -->
+              <!-- 톡딜 -->
               <div class="flex flex-col items-center cursor-pointer group relative active:scale-95 transition">
                 <span class="absolute top-1 right-5 w-1.5 h-1.5 bg-[#FF3B30] rounded-full"></span>
                 <div class="w-10 h-10 flex items-center justify-center mb-1 text-neutral-600">
                   <svg class="w-6 h-6 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="8" cy="8" r="2" />
-                    <circle cx="16" cy="16" r="2" />
-                    <line x1="19" y1="5" x2="5" y2="19" />
+                    <circle cx="8" cy="8" r="2" /><circle cx="16" cy="16" r="2" /><line x1="19" y1="5" x2="5" y2="19" />
                   </svg>
                 </div>
                 <span>톡딜</span>
               </div>
 
-              <!-- 4. 이모티콘 (with red dot) -->
+              <!-- 이모티콘 -->
               <div class="flex flex-col items-center cursor-pointer group relative active:scale-95 transition">
                 <span class="absolute top-1 right-5 w-1.5 h-1.5 bg-[#FF3B30] rounded-full"></span>
                 <div class="w-10 h-10 flex items-center justify-center mb-1 text-neutral-600">
                   <svg class="w-6 h-6 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="9" />
-                    <path d="M9 10h.01M15 10h.01" stroke-width="2.2"/>
-                    <path d="M9.5 15a4 4 0 0 0 5 0" />
+                    <circle cx="12" cy="12" r="9" /><path d="M9 10h.01M15 10h.01" stroke-width="2.2"/><path d="M9.5 15a4 4 0 0 0 5 0" />
                   </svg>
                 </div>
                 <span>이모티콘</span>
               </div>
 
-              <!-- 5. 라이브쇼핑 -->
+              <!-- 라이브쇼핑 -->
               <div class="flex flex-col items-center cursor-pointer group active:scale-95 transition">
                 <div class="w-10 h-10 flex items-center justify-center mb-1 text-neutral-600">
                   <div class="w-7 h-5 border-[1.7px] border-neutral-600 rounded-[6px] flex items-center justify-center font-black text-[8px] tracking-tight text-neutral-600">
@@ -184,61 +190,48 @@
                 <span>라이브쇼핑</span>
               </div>
 
-              <!-- 6. 메이커스 (with red dot) -->
+              <!-- 메이커스 -->
               <div class="flex flex-col items-center cursor-pointer group relative active:scale-95 transition">
                 <span class="absolute top-1 right-5 w-1.5 h-1.5 bg-[#FF3B30] rounded-full"></span>
                 <div class="w-10 h-10 flex items-center justify-center mb-1 text-neutral-600">
-                  <div class="w-6 h-6 rounded-full border-[1.7px] border-neutral-600 flex items-center justify-center font-bold text-xs">
-                    M
-                  </div>
+                  <div class="w-6 h-6 rounded-full border-[1.7px] border-neutral-600 flex items-center justify-center font-bold text-xs">M</div>
                 </div>
                 <span>메이커스</span>
               </div>
 
-              <!-- 7. 프렌즈 (with red dot) -->
+              <!-- 프렌즈 -->
               <div class="flex flex-col items-center cursor-pointer group relative active:scale-95 transition">
                 <span class="absolute top-1 right-5 w-1.5 h-1.5 bg-[#FF3B30] rounded-full"></span>
                 <div class="w-10 h-10 flex items-center justify-center mb-1 text-neutral-600">
-                  <!-- Ryan bear head silhouette -->
                   <svg class="w-6 h-6 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="5" cy="8" r="2.2" />
-                    <circle cx="19" cy="8" r="2.2" />
-                    <rect x="4" y="7" width="16" height="13" rx="6.5" />
-                    <line x1="8.5" y1="12" x2="10.5" y2="12" stroke-width="2"/>
-                    <line x1="13.5" y1="12" x2="15.5" y2="12" stroke-width="2"/>
-                    <circle cx="12" cy="14" r="1" fill="currentColor"/>
+                    <circle cx="5" cy="8" r="2.2" /><circle cx="19" cy="8" r="2.2" /><rect x="4" y="7" width="16" height="13" rx="6.5" />
+                    <line x1="8.5" y1="12" x2="10.5" y2="12" stroke-width="2"/><line x1="13.5" y1="12" x2="15.5" y2="12" stroke-width="2"/><circle cx="12" cy="14" r="1" fill="currentColor"/>
                   </svg>
                 </div>
                 <span>프렌즈</span>
               </div>
 
-              <!-- 8. AI국민비서 -->
+              <!-- AI국민비서 -->
               <div class="flex flex-col items-center cursor-pointer group active:scale-95 transition">
                 <div class="w-10 h-10 flex items-center justify-center mb-1 text-neutral-600">
-                  <!-- Korean Taeguk/Government Symbol -->
                   <svg class="w-6 h-6 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.6">
-                    <circle cx="12" cy="12" r="9" />
-                    <path d="M12 3a9 9 0 0 1 0 18 4.5 4.5 0 0 1 0-9 4.5 4.5 0 0 0 0-9z" />
+                    <circle cx="12" cy="12" r="9" /><path d="M12 3a9 9 0 0 1 0 18 4.5 4.5 0 0 1 0-9 4.5 4.5 0 0 0 0-9z" />
                   </svg>
                 </div>
                 <span>AI국민비서</span>
               </div>
 
-              <!-- 9. 모바일신분증 (클릭시 지갑으로 이동) -->
+              <!-- 모바일신분증 (클릭 시 지갑 화면으로) -->
               <div onclick="goToScreen('wallet')" class="flex flex-col items-center cursor-pointer group active:scale-95 transition">
                 <div class="w-10 h-10 flex items-center justify-center mb-1 text-neutral-600">
                   <svg class="w-6 h-6 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="5" width="20" height="14" rx="2" />
-                    <circle cx="8" cy="11.5" r="2" />
-                    <path d="M5.5 15.5a2.5 2.5 0 0 1 5 0" />
-                    <line x1="14" y1="10" x2="18" y2="10" />
-                    <line x1="14" y1="13" x2="17" y2="13" />
+                    <rect x="2" y="5" width="20" height="14" rx="2" /><circle cx="8" cy="11.5" r="2" /><path d="M5.5 15.5a2.5 2.5 0 0 1 5 0" /><line x1="14" y1="10" x2="18" y2="10" /><line x1="14" y1="13" x2="17" y2="13" />
                   </svg>
                 </div>
                 <span>모바일신분증</span>
               </div>
 
-              <!-- 10. 톡클라우드 -->
+              <!-- 톡클라우드 -->
               <div class="flex flex-col items-center cursor-pointer group active:scale-95 transition">
                 <div class="w-10 h-10 flex items-center justify-center mb-1 text-neutral-600">
                   <svg class="w-6 h-6 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
@@ -248,38 +241,29 @@
                 <span>톡클라우드</span>
               </div>
 
-              <!-- 11. 캘린더 -->
+              <!-- 캘린더 -->
               <div class="flex flex-col items-center cursor-pointer group active:scale-95 transition">
                 <div class="w-10 h-10 flex items-center justify-center mb-1 text-neutral-600">
                   <svg class="w-6 h-6 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                    <line x1="16" y1="2" x2="16" y2="6" />
-                    <line x1="8" y1="2" x2="8" y2="6" />
-                    <line x1="3" y1="10" x2="21" y2="10" />
-                    <polyline points="9 15 11 17 15 13" />
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /><polyline points="9 15 11 17 15 13" />
                   </svg>
                 </div>
                 <span>캘린더</span>
               </div>
 
-              <!-- 12. 예약하기 (with red dot) -->
+              <!-- 예약하기 -->
               <div class="flex flex-col items-center cursor-pointer group relative active:scale-95 transition">
                 <span class="absolute top-1 right-5 w-1.5 h-1.5 bg-[#FF3B30] rounded-full"></span>
                 <div class="w-10 h-10 flex items-center justify-center mb-1 text-neutral-600">
                   <svg class="w-6 h-6 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                    <line x1="16" y1="2" x2="16" y2="6" />
-                    <line x1="8" y1="2" x2="8" y2="6" />
-                    <line x1="3" y1="10" x2="21" y2="10" />
-                    <path d="M10 16h4m0 0l-2-2m2 2l-2 2" />
+                    <rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /><path d="M10 16h4m0 0l-2-2m2 2l-2 2" />
                   </svg>
                 </div>
                 <span>예약하기</span>
               </div>
-
             </div>
 
-            <!-- Carousel dot indicators -->
+            <!-- 인디케이터 점 -->
             <div class="flex justify-center items-center space-x-1.5 mt-2.5 pt-1">
               <span class="w-4 h-1 bg-stone-500 rounded-full"></span>
               <span class="w-1 h-1 bg-neutral-300 rounded-full"></span>
@@ -288,25 +272,21 @@
           </div>
         </div>
 
-        <!-- CASETiFY Ad Banner matching Screenshot 1 -->
+        <!-- 케이스티파이 광고 배너 -->
         <div class="px-4 mt-2.5">
           <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-neutral-100">
             <div class="bg-[#F5F5F7] p-3.5 flex items-center justify-between relative">
               <span class="absolute top-2 right-2.5 text-[9px] text-neutral-400 font-bold border border-neutral-300 px-1 py-0.2 rounded">AD</span>
               
-              <!-- Case Mockup Graphic -->
               <div class="w-16 h-24 bg-white rounded-2xl shadow-md border border-neutral-200 relative flex flex-col items-center justify-center p-1 overflow-hidden shrink-0">
-                <!-- Camera bump -->
                 <div class="w-6 h-6 bg-neutral-900 rounded-lg absolute top-1.5 left-1.5 p-0.5 grid grid-cols-2 gap-0.5">
                   <div class="w-1.5 h-1.5 rounded-full bg-neutral-400 m-auto"></div>
                   <div class="w-1.5 h-1.5 rounded-full bg-neutral-400 m-auto"></div>
                 </div>
-                <!-- Magnetic ring -->
                 <div class="w-8 h-8 rounded-full border border-neutral-300 mt-4"></div>
                 <div class="absolute -bottom-1 text-sm">🤍</div>
               </div>
 
-              <!-- Ad Copy -->
               <div class="flex-1 ml-3 text-right">
                 <span class="inline-block bg-black text-white text-[9px] font-bold px-1.5 py-0.5 rounded tracking-tighter mb-1">CASETiFY</span>
                 <h3 class="text-xs font-black text-neutral-900 leading-tight">NEW 아이폰 18 케이스</h3>
@@ -315,7 +295,6 @@
               </div>
             </div>
 
-            <!-- Ad Bottom Action Row -->
             <div class="px-3 py-2 bg-white flex justify-between items-center border-t border-neutral-100">
               <span class="text-[11px] text-neutral-800 font-medium">케이스티파이 NEW 아이폰 18 케이스</span>
               <button class="text-[11px] text-neutral-800 font-semibold bg-neutral-100 hover:bg-neutral-200 px-2.5 py-0.5 rounded-md">구매하기</button>
@@ -324,9 +303,8 @@
         </div>
       </section>
 
-      <!-- ================= SCREEN 2: 지갑 화면 ================= -->
-      <section id="screen-wallet" class="absolute inset-0 flex flex-col bg-dots transition-opacity duration-200 z-10 pointer-events-none opacity-0 overflow-y-auto no-scrollbar pb-24">
-        <!-- Top App Bar -->
+      <!-- ================= 화면 2: 지갑 ================= -->
+      <section id="screen-wallet" class="absolute inset-0 flex flex-col bg-dots transition-opacity duration-200 z-10 pointer-events-none opacity-0 overflow-y-auto no-scrollbar pb-32">
         <div class="px-5 pt-2 pb-2 flex items-center justify-between">
           <h1 class="text-[22px] font-extrabold text-neutral-800 tracking-tight">더보기</h1>
           <div class="flex items-center space-x-3.5 text-neutral-700 text-xl">
@@ -339,7 +317,6 @@
           </div>
         </div>
 
-        <!-- Category Nav Pills -->
         <nav class="px-5 py-1.5 flex items-center space-x-2">
           <button onclick="goToScreen('home')" class="px-3.5 py-1 rounded-full text-xs font-semibold bg-white text-neutral-700 shadow-sm hover:bg-neutral-50 active:scale-95 transition">홈</button>
           <button class="px-3.5 py-1 rounded-full text-xs font-bold bg-neutral-900 text-white shadow-sm flex items-center space-x-1">
@@ -348,7 +325,6 @@
           <button class="px-3.5 py-1 rounded-full text-xs font-semibold bg-white text-neutral-700 shadow-sm hover:bg-neutral-50">게임</button>
         </nav>
 
-        <!-- Terms Announcement Banner -->
         <div class="px-4 mt-2">
           <div class="bg-neutral-200/70 rounded-xl px-3 py-2.5 flex items-center justify-between text-[11px] text-neutral-700 cursor-pointer active:opacity-75">
             <div class="flex items-center space-x-2 truncate">
@@ -359,7 +335,6 @@
           </div>
         </div>
 
-        <!-- Section Bar: 보유 & + 발급 -->
         <div class="px-5 mt-3.5 flex items-center justify-between">
           <span class="text-xs font-bold text-neutral-700">보유</span>
           <button class="text-[11px] text-neutral-700 font-semibold bg-white px-2.5 py-1 rounded-full shadow-sm border border-neutral-200 hover:bg-neutral-50 flex items-center space-x-0.5">
@@ -368,10 +343,9 @@
           </button>
         </div>
 
-        <!-- Layered Realistic Overlapping Card Deck -->
+        <!-- 겹쳐진 카드 스택 -->
         <div class="px-4 mt-2 relative">
-          
-          <!-- Card 1: 인증서 (Interactive -> Leads to Screen 3) -->
+          <!-- 카드 1: 인증서 (클릭 시 화면 3으로 이동) -->
           <div onclick="goToScreen('cert')" class="stacked-card cursor-pointer relative bg-gradient-to-br from-[#71F2BF] to-[#4FE1A8] rounded-2xl p-4 text-neutral-900 overflow-hidden border border-emerald-300 h-44 z-10 active:scale-[0.98]">
             <div class="flex justify-between items-start">
               <div class="flex items-center space-x-2">
@@ -383,14 +357,10 @@
               <span class="w-4 h-4 bg-[#FF3B30] text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow">1</span>
             </div>
             
-            <!-- Jordy Peek Top Half -->
             <div class="absolute right-10 top-10 flex flex-col items-center pointer-events-none">
               <svg class="w-28 h-28" viewBox="0 0 120 120" fill="none">
-                <!-- Hair curl -->
                 <path d="M58 20 C54 12 68 8 70 18 C72 24 57 26 55 21" stroke="#1E293B" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-                <!-- Head -->
                 <path d="M30 110 C 25 65 50 25 80 25 C 105 25 110 65 105 110 Z" fill="#65E8B0" />
-                <!-- Eyes & Face -->
                 <path d="M52 48 Q 57 44 62 48" stroke="#1E293B" stroke-width="2.5" stroke-linecap="round" fill="none"/>
                 <path d="M78 48 Q 83 44 88 48" stroke="#1E293B" stroke-width="2.5" stroke-linecap="round" fill="none"/>
                 <path d="M66 54 Q 70 59 74 54" stroke="#1E293B" stroke-width="2.5" stroke-linecap="round" fill="none"/>
@@ -399,7 +369,7 @@
             </div>
           </div>
 
-          <!-- Card 2: 충북대학교 대학생카드 -->
+          <!-- 카드 2: 충북대학교 대학생카드 -->
           <div class="stacked-card relative bg-[#DCF5EE] rounded-2xl p-4 text-neutral-900 border border-teal-200 h-44 -mt-28 z-20">
             <div class="flex justify-between items-start">
               <div class="flex items-center space-x-2">
@@ -408,11 +378,10 @@
               </div>
               <span class="text-[10px] text-teal-900 font-semibold bg-white/70 px-2 py-0.5 rounded border border-teal-200">22일 남음</span>
             </div>
-            <!-- Ryan peek illustration -->
             <div class="absolute right-14 top-14 w-20 h-16 bg-[#FED170] rounded-t-3xl border border-amber-300 opacity-90"></div>
           </div>
 
-          <!-- Card 3: 예약하기 -->
+          <!-- 카드 3: 예약하기 -->
           <div class="stacked-card relative bg-[#FFF4DE] rounded-2xl p-4 text-neutral-900 border border-amber-100 h-44 -mt-28 z-30">
             <div class="flex items-center space-x-2">
               <i class="ph-fill ph-chat-circle-dots text-neutral-900 text-base"></i>
@@ -421,7 +390,7 @@
             <div class="absolute right-14 top-14 w-20 h-16 bg-[#FED677] rounded-t-2xl opacity-90"></div>
           </div>
 
-          <!-- Card 4: 채널 쿠폰 -->
+          <!-- 카드 4: 채널 쿠폰 -->
           <div class="stacked-card relative bg-[#FCECD0] rounded-2xl p-4 text-neutral-900 border border-amber-200 h-44 -mt-28 z-40">
             <div class="flex items-center space-x-2">
               <span class="bg-black text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">Ch</span>
@@ -430,7 +399,7 @@
             <div class="absolute right-14 top-14 w-20 h-16 bg-[#FFD13B] rounded-t-2xl opacity-90"></div>
           </div>
 
-          <!-- Card 5: 카카오 톡딜 멤버십 -->
+          <!-- 카드 5: 카카오 톡딜 멤버십 -->
           <div class="stacked-card relative bg-[#E1F7EA] rounded-2xl p-4 text-neutral-900 border border-emerald-100 h-44 -mt-28 z-50">
             <div class="flex items-center space-x-2">
               <span class="text-red-500 font-black text-sm">%%</span>
@@ -438,7 +407,7 @@
             </div>
           </div>
 
-          <!-- Card 6: 카카오뱅크 모바일 신분증 -->
+          <!-- 카드 6: 카카오뱅크 모바일 신분증 -->
           <div class="stacked-card relative bg-[#FFD200] rounded-2xl p-4 text-neutral-900 border border-yellow-400 h-44 -mt-28 z-60">
             <div class="flex items-center space-x-2 mb-2">
               <span class="text-blue-900 text-sm">📚</span>
@@ -446,13 +415,11 @@
             </div>
             <h3 class="text-base font-extrabold text-neutral-900 tracking-tight">카카오뱅크 모바일 신분증</h3>
           </div>
-
         </div>
       </section>
 
-      <!-- ================= SCREEN 3: 인증서 상세 화면 ================= -->
-      <section id="screen-cert" class="absolute inset-0 flex flex-col bg-white transition-opacity duration-200 z-30 pointer-events-none opacity-0 overflow-y-auto no-scrollbar">
-        <!-- Certificate Header (Clean: NO edit button hints) -->
+      <!-- ================= 화면 3: 인증서 상세 화면 ================= -->
+      <section id="screen-cert" class="absolute inset-0 flex flex-col bg-white transition-opacity duration-200 z-30 pointer-events-none opacity-0 overflow-y-auto no-scrollbar pb-10">
         <div class="px-5 pt-2 pb-2 flex items-center justify-between">
           <button onclick="goToScreen('wallet')" class="w-9 h-9 rounded-full flex items-center justify-center text-neutral-800 hover:bg-neutral-100 text-xl transition active:scale-90 border border-neutral-100 shadow-sm" title="닫기">
             <i class="ph-bold ph-x"></i>
@@ -462,11 +429,8 @@
           </button>
         </div>
 
-        <!-- Mint Certificate Jordy Card (Pixel-perfect recreation) -->
         <div class="px-4 mt-2">
           <div class="w-full bg-gradient-to-b from-[#65E9B4] via-[#56E0A6] to-[#45D698] rounded-3xl p-5 shadow-lg relative overflow-hidden text-neutral-900 min-h-[235px] border border-emerald-300 flex flex-col justify-between">
-            
-            <!-- Card Header Badge -->
             <div class="flex items-center space-x-2 z-20">
               <div class="w-6 h-6 rounded-lg bg-[#2563EB] flex items-center justify-center text-white text-xs shadow-md">
                 <div class="w-2.5 h-2.5 bg-[#FACC15] rounded-full"></div>
@@ -474,65 +438,47 @@
               <span class="font-extrabold text-base text-neutral-900 tracking-tight">인증서</span>
             </div>
 
-            <!-- Detailed 3D Jordy Graphic (SVG with Lighting, Gradient and Details) -->
+            <!-- 죠르디 피규어 일러스트 -->
             <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
               <svg class="w-56 h-56 -mt-2" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <defs>
-                  <!-- Jordy Body Gradient -->
                   <radialGradient id="jordySkin" cx="40%" cy="35%" r="65%">
                     <stop offset="0%" stop-color="#91F8CB"/>
                     <stop offset="60%" stop-color="#60E2A8"/>
                     <stop offset="100%" stop-color="#3DC98E"/>
                   </radialGradient>
-                  <!-- 3D Limb Gradient -->
                   <linearGradient id="jordyLimb" x1="0" y1="0" x2="1" y2="1">
                     <stop offset="0%" stop-color="#8BF7C6"/>
                     <stop offset="100%" stop-color="#49CE94"/>
                   </linearGradient>
-                  <!-- Soft Shadow Filter -->
                   <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
                     <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#238259" flood-opacity="0.3"/>
                   </filter>
                 </defs>
 
-                <!-- Yellow Back Spikes / Crests -->
                 <circle cx="132" cy="48" r="9" fill="#FFDA33" stroke="#F4C719" stroke-width="1.2"/>
                 <circle cx="145" cy="74" r="8" fill="#FFDA33" stroke="#F4C719" stroke-width="1.2"/>
                 <circle cx="147" cy="100" r="7.5" fill="#FFDA33" stroke="#F4C719" stroke-width="1.2"/>
                 <circle cx="148" cy="125" r="6" fill="#FFDA33" stroke="#F4C719" stroke-width="1.2"/>
 
-                <!-- Jordy Chubby Dinosaur Body with 3D shadow -->
                 <path d="M 66 185 C 44 165 46 95 80 50 C 112 16 150 48 142 120 C 137 165 118 185 66 185 Z" 
                       fill="url(#jordySkin)" filter="url(#softShadow)"/>
 
-                <!-- Hair swirl curl on head -->
                 <path d="M 97 44 C 92 35 106 28 109 39 C 111 48 95 48 93 45" stroke="#1E293B" stroke-width="2.6" stroke-linecap="round" fill="none"/>
-
-                <!-- Cute Derpy Curved Closed Eyes -->
                 <path d="M 82 63 Q 87 59 92 63" stroke="#1E293B" stroke-width="2.6" stroke-linecap="round" fill="none"/>
                 <path d="M 107 62 Q 112 58 117 62" stroke="#1E293B" stroke-width="2.6" stroke-linecap="round" fill="none"/>
-
-                <!-- Mouth with protruding Pink Tongue -->
                 <path d="M 95 68 Q 99 74 103 68" stroke="#1E293B" stroke-width="2.4" stroke-linecap="round" fill="none"/>
                 <path d="M 96 70 C 96 76 102 76 102 70 Z" fill="#FF6584" stroke="#1E293B" stroke-width="1.2"/>
 
-                <!-- Left Arm Nub -->
                 <ellipse cx="78" cy="108" rx="8" ry="12" fill="url(#jordyLimb)" stroke="#45CE93" stroke-width="1.2" transform="rotate(-30 78 108)"/>
-                
-                <!-- Right Arm Nub -->
                 <ellipse cx="122" cy="102" rx="8" ry="12" fill="url(#jordyLimb)" stroke="#45CE93" stroke-width="1.2" transform="rotate(25 122 102)"/>
-
-                <!-- Stomach Highlight Glow -->
                 <ellipse cx="98" cy="120" rx="22" ry="28" fill="#88F9C8" opacity="0.3"/>
               </svg>
             </div>
 
-            <!-- Bottom Information Area -->
+            <!-- 하단 정보 및 이름 영역 -->
             <div class="flex items-end justify-between z-20 pt-28">
-              
-              <!-- Left: Trust Stamp & Expiration Date -->
               <div class="flex flex-col space-y-1">
-                <!-- Circular TRUST eSign Stamp -->
                 <div class="w-10 h-10 rounded-full border border-neutral-700/60 p-0.5 flex flex-col items-center justify-center text-center opacity-70">
                   <span class="text-[5px] font-medium leading-none text-neutral-800">전자서명인증업무</span>
                   <div class="my-0.2">
@@ -546,25 +492,21 @@
                 </div>
               </div>
 
-              <!-- Right: Name (Pure, discrete, no edit button hint) & Legal Subtitle -->
+              <!-- 수정 버튼 표시 없이 이름 터치 시만 변경 모달 실행 -->
               <div class="flex flex-col items-end text-right">
-                <!-- Secret tap area: Looks completely standard without pencil icon or dashed line -->
-                <div onclick="promptChangeName()" class="cursor-pointer active:opacity-70 transition py-0.5 select-none" title="">
+                <div onclick="promptChangeName()" class="cursor-pointer active:opacity-75 transition py-0.5 select-none" title="">
                   <span id="userNameDisplay" class="text-xl font-black text-neutral-900 tracking-tight">이송은</span>
                 </div>
                 <p class="text-[9.5px] text-neutral-700/90 font-medium mt-0.5 tracking-tight">전자서명법 기준을 준수한 안전한 인증서</p>
               </div>
-
             </div>
           </div>
         </div>
 
-        <!-- Recent Verification History List matching Screenshot 3 -->
-        <div class="px-5 mt-6 pb-20">
+        <!-- 최근 인증 이력 -->
+        <div class="px-5 mt-6 pb-16">
           <h2 class="text-xs font-bold text-neutral-500 mb-3.5 tracking-wider">최근 인증 이력</h2>
-          
           <div class="space-y-4 divide-y divide-neutral-100">
-            <!-- Item 1: 정부24 간편인증 -->
             <div class="pt-3 first:pt-0">
               <div class="flex items-center space-x-1.5">
                 <h3 class="text-sm font-bold text-neutral-900">정부24 간편인증</h3>
@@ -574,28 +516,24 @@
               <p class="text-xs text-neutral-400 mt-1 font-mono">2026. 10. 9. 21:35:23</p>
             </div>
 
-            <!-- Item 2: 한국장학재단 간편인증 -->
             <div class="pt-3">
               <h3 class="text-sm font-bold text-neutral-900">한국장학재단 간편인증</h3>
               <p class="text-xs text-neutral-500 mt-0.5">한국장학재단 · 생체인증</p>
               <p class="text-xs text-neutral-400 mt-1 font-mono">2026. 10. 8. 09:05:50</p>
             </div>
 
-            <!-- Item 3: 전자서명 -->
             <div class="pt-3">
               <h3 class="text-sm font-bold text-neutral-900">전자서명</h3>
               <p class="text-xs text-neutral-500 mt-0.5">NH농협카드 카드론 · 생체인증</p>
               <p class="text-xs text-neutral-400 mt-1 font-mono">2026. 10. 7. 22:21:34</p>
             </div>
 
-            <!-- Item 4: 한국장학재단 간편인증 -->
             <div class="pt-3">
               <h3 class="text-sm font-bold text-neutral-900">한국장학재단 간편인증</h3>
               <p class="text-xs text-neutral-500 mt-0.5">한국장학재단 · 생체인증</p>
               <p class="text-xs text-neutral-400 mt-1 font-mono">2026. 10. 6. 21:10:18</p>
             </div>
 
-            <!-- Item 5: 한국장학재단 간편인증 -->
             <div class="pt-3">
               <h3 class="text-sm font-bold text-neutral-900">한국장학재단 간편인증</h3>
               <p class="text-xs text-neutral-500 mt-0.5">한국장학재단 · 생체인증</p>
@@ -605,51 +543,51 @@
         </div>
       </section>
 
-      <!-- Bottom Dock Bar (Shared across Screen 1 & Screen 2) -->
-      <footer id="bottom-bar" class="absolute bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-neutral-100 px-4 py-2 z-25 flex flex-col items-center">
-        <!-- Floating Banner -->
-        <div class="w-full flex items-center justify-between mb-1.5">
-          <span class="text-xs font-bold text-neutral-800">카카오 나우</span>
-          <div class="bg-amber-950/80 text-white text-[11px] px-2.5 py-0.5 rounded-full flex items-center space-x-1.5 shadow">
-            <span class="bg-indigo-500 text-white text-[9px] px-1 rounded font-bold">%</span>
-            <span>구운란 30구 5천원대</span>
-            <span class="text-neutral-400 text-xs cursor-pointer">✕</span>
+      <!-- ================= 첫 번째 사진과 100% 동일한 하단 바 ================= -->
+      <footer id="bottom-bar" class="absolute bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-neutral-100 px-4 pt-1.5 safe-bottom z-30 flex flex-col items-center">
+        <!-- 카카오 나우 플로팅 배너 -->
+        <div class="w-full flex items-center justify-between mb-1">
+          <span class="text-[12px] font-bold text-neutral-800">카카오 나우</span>
+          <div class="bg-[#5c3e34] text-white text-[10.5px] px-2.5 py-0.5 rounded-full flex items-center space-x-1.5 shadow-sm">
+            <span class="bg-[#5d5fe6] text-white text-[9px] px-1 rounded font-black">%</span>
+            <span class="font-medium">구운란 30구 5천원대</span>
+            <span class="text-neutral-400 text-[11px] cursor-pointer ml-0.5">✕</span>
           </div>
         </div>
 
-        <!-- 5 Bottom Character Icons matching Screenshot -->
-        <div class="w-full flex justify-around items-center pt-0.5">
-          <!-- 1. Moon -->
-          <button class="text-xl opacity-75 active:scale-90 transition">🌙</button>
+        <!-- 5개 캐릭터 네비게이션 아이콘 (실제 스크린샷 1과 완벽 일치) -->
+        <div class="w-full flex justify-around items-center pt-1 pb-1">
+          <!-- 1. 초승달 -->
+          <button class="text-[22px] opacity-75 active:scale-90 transition">🌙</button>
 
-          <!-- 2. Hamster with 999+ red pill -->
+          <!-- 2. 햄스터 + 999+ 빨간 배지 -->
           <div class="relative cursor-pointer active:scale-90 transition">
-            <span class="text-xl">🐹</span>
-            <span class="absolute -top-1.5 -right-2 bg-[#FF3B30] text-white text-[8px] font-black px-1 rounded-full">999+</span>
+            <span class="text-[22px]">🐹</span>
+            <span class="absolute -top-1.5 -right-2 bg-[#FF3B30] text-white text-[8px] font-black px-1 rounded-full leading-tight shadow-sm">999+</span>
           </div>
 
-          <!-- 3. Star with 39 red pill -->
+          <!-- 3. 별 + 39 배지 -->
           <div class="relative cursor-pointer active:scale-90 transition">
-            <span class="text-xl">⭐</span>
-            <span class="absolute -top-1.5 -right-1 bg-[#FF3B30] text-white text-[8px] font-black px-1 rounded-full">39</span>
+            <span class="text-[22px]">⭐</span>
+            <span class="absolute -top-1.5 -right-1 bg-[#FF3B30] text-white text-[8px] font-black px-1 rounded-full leading-tight shadow-sm">39</span>
           </div>
 
-          <!-- 4. Mascot Rabbit -->
-          <button class="text-xl opacity-75 active:scale-90 transition">🐭</button>
+          <!-- 4. 토끼 마스코트 -->
+          <button class="text-[22px] opacity-75 active:scale-90 transition">🐭</button>
 
-          <!-- 5. Moon with red dot -->
+          <!-- 5. 초승달 + 레드 닷 -->
           <div class="relative cursor-pointer active:scale-90 transition">
-            <span class="text-xl">🌙</span>
+            <span class="text-[22px]">🌙</span>
             <span class="absolute top-0 right-0 w-1.5 h-1.5 bg-[#FF3B30] rounded-full"></span>
           </div>
         </div>
       </footer>
 
-      <!-- Secret Name Customization Modal (Opens only upon tapping the name) -->
-      <div id="secretNameModal" class="absolute inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6 hidden">
-        <div class="bg-white rounded-3xl p-6 w-full max-w-xs shadow-2xl border border-neutral-100 transform transition-all">
+      <!-- 비밀 이름 변경 모달 -->
+      <div id="secretNameModal" class="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6 hidden">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-xs shadow-2xl border border-neutral-100">
           <h3 class="font-bold text-base text-neutral-900 mb-1">인증서 이름 변경</h3>
-          <p class="text-xs text-neutral-500 mb-4">인증서에 표시될 이름을 입력하세요.</p>
+          <p class="text-xs text-neutral-500 mb-4">인증서에 표시할 이름을 입력하세요.</p>
           
           <input type="text" id="secretNameInput" placeholder="이름 입력" maxlength="12" 
                  class="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl text-base font-bold text-neutral-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white mb-4 transition" />
@@ -665,7 +603,6 @@
   </div>
 
   <script>
-    // State management
     let currentScreen = 'home';
     let certificateOwner = localStorage.getItem('kakao_cert_name') || '이송은';
 
@@ -677,10 +614,9 @@
     const secretModal = document.getElementById('secretNameModal');
     const secretInput = document.getElementById('secretNameInput');
 
-    // Display current saved name
     userNameDisplay.innerText = certificateOwner;
 
-    // Real-time Status Clock
+    // 실시간 시간 업데이트
     function updateClock() {
       const now = new Date();
       const hours = String(now.getHours()).padStart(2, '0');
@@ -691,7 +627,7 @@
     updateClock();
     setInterval(updateClock, 30000);
 
-    // Screen Switching
+    // 화면 전환 제어
     function goToScreen(screenName) {
       currentScreen = screenName;
 
@@ -715,15 +651,15 @@
       } else if (screenName === 'cert') {
         screenCert.classList.remove('opacity-0', 'pointer-events-none');
         screenCert.classList.add('opacity-100', 'pointer-events-auto');
-        bottomBar.style.display = 'none'; // Hide dock on certificate detail
+        bottomBar.style.display = 'none'; // 인증서 화면에서는 실제 앱처럼 하단 바 숨김
       }
     }
 
-    // Secret Name Customization: Triggered strictly by touching the name
+    // 이름 변경 모달 (오직 이름 터치 시만 노출)
     function promptChangeName() {
       secretInput.value = certificateOwner;
       secretModal.classList.remove('hidden');
-      setTimeout(() => secretInput.focus(), 60);
+      setTimeout(() => secretInput.focus(), 80);
     }
 
     function closeSecretModal() {
@@ -740,7 +676,6 @@
       closeSecretModal();
     }
 
-    // Enter & Escape key handling
     secretInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') saveSecretName();
       if (e.key === 'Escape') closeSecretModal();
